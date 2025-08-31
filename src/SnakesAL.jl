@@ -17,5 +17,7 @@ import StatsBase.Weights
 include("types.jl")
 include("someFuns.jl")
 
+export makeDiceAndRoll, oneRound, testGame
+
 
 end

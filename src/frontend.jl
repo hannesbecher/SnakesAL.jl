@@ -5,9 +5,19 @@ WIDTH = 1000
 # Global variables to store a range of colors. 
 # The Colors package is always imported into a game
 
+g = Game(Board(100, [Ladder(3, 22), Snake(17, 4)]),
+                    [Player("Alice", 1), Player("Bob", 1)],
+                    Dice(6),
+                    1,
+                    false)
+
 px=500
 py=500
 offset = 200
+
+
+# function to draw a arrow, based on Line
+
 
 # The draw function is called once per frame to render objects to the screen.
 # In our game, we only define the `draw` function, it's called by the engine. 
@@ -51,9 +61,10 @@ end
 
 # If the "space" key is pressed, the sign of offste changes
 function on_key_down(g, k)
-    global offset
+    global g
     if k == Keys.SPACE
-        changeOffsetSign()
-        schedule_once(changeOffsetSign, 1)
+        # one game round
+        oneRound(g)
+        #schedule_once(changeOffsetSign, 1)
     end
 end

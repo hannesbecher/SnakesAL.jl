@@ -20,9 +20,7 @@ end
 
 testGame() = Game(Board(100, [Ladder(3, 22), Snake(17, 4)]),
                     [Player("Alice", 1), Player("Bob", 1)],
-                    Dice(6),
-                    1,
-                    false)
+                    Dice(6))
 
 
 oneRound(g::Game) = begin

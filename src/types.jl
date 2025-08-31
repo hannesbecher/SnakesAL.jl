@@ -53,4 +53,5 @@ mutable struct Game
     dice::AbstractDice
     current_player_index::Int
     is_over::Bool
+    Game(board, players, dice) = length(players) > 4 ? error("Four players max!") : new(board, players, dice, 1, false)
 end

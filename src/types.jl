@@ -5,11 +5,12 @@
 # we need ladders and snakes that are nested in the same abstract type
 abstract type ShortCut end
 
+# a shortcut that makes players to move forward
 struct Ladder <: ShortCut
     from::Int
     to::Int
 end
-
+# a shortcut that makes players to move backward
 struct Snake <: ShortCut
     from::Int
     to ::Int

@@ -9,17 +9,17 @@ WIDTH = 1000
 
 
 
-arr1 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr1.pos = (50,50)
+arr1 = TextActor("START", "moonhouse", font_size=24, color=[0,0,0,0]); arr1.pos = (50,950)
 arr2 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr2.pos = (50,150)
-arr3 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr3.pos = (50,250)
+arr3 = TextActor("<--", "moonhouse", font_size=24, color=[0,0,0,0]); arr3.pos = (950,250)
 arr4 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr4.pos = (50,350)
-arr5 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr5.pos = (50,450)
+arr5 = TextActor("<--", "moonhouse", font_size=24, color=[0,0,0,0]); arr5.pos = (950,450)
 arr6 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr6.pos = (50,550)
-arr7 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr7.pos = (50,650)
+arr7 = TextActor("<--", "moonhouse", font_size=24, color=[0,0,0,0]); arr7.pos = (950,650)
 arr8 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr8.pos = (50,750)
-arr9 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr9.pos = (50,850)
-arr10 = TextActor("-->", "moonhouse", font_size=24, color=[0,0,0,0]); arr10.pos = (50,950)
-
+arr9 = TextActor("<--", "moonhouse", font_size=24, color=[0,0,0,0]); arr9.pos = (950,850)
+arr10 = TextActor("<--", "moonhouse", font_size=24, color=[0,0,0,0]); arr10.pos = (950,50)
+arr11 = TextActor("GOAL", "moonhouse", font_size=24, color=[0,0,0,0]); arr11.pos = (50,50)
 ##############################################
 
 
@@ -137,6 +137,17 @@ end
 # convert position to table coordinates
 posToTBT(pos::Int) = (((pos - 1) % 10 + 1) * 100 - 50, (10 - div(pos - 1, 10)) * 100 - 50)
 
+
+# alternative pos to 10x10 with forth and back
+posToTBT2(pos::Int) = begin
+    row = div(pos - 1, 10)
+    col = (pos - 1) % 10
+    if isodd(row)
+        col = 9 - col
+    end
+    return ((col + 1) * 100 - 50, (10 - row) * 100 - 50)
+end
+
 addJitter(x, y, pxMax=3) = (x + rand(-pxMax:pxMax), y + rand(-pxMax:pxMax))
 
 ##############################################
@@ -182,7 +193,7 @@ function draw()
 
     global gg
 
-    draw(arr1)
+    draw(arr1) #START
     draw(arr2)
     draw(arr3)
     draw(arr4)
@@ -192,26 +203,33 @@ function draw()
     draw(arr8)
     draw(arr9)
     draw(arr10)
+    draw(arr11) # GOAL
 
     # the game grid, 100 field ATM, consider making adjustable
     for i in 1:9
         #l = Line(xpos1, ypos1, xpos2, ypos2)
-        draw(Line(100i, 1, 100i, 1000), colorant"darkgrey")
-        draw(Line(0, 100i, 1000, 100i), colorant"darkgrey")
+        draw(Line(100i, 1, 100i, 1000), colorant"darkgrey") # vertical
+        draw(Line(0, 100i, 1000, 100i), colorant"darkgrey") # horizontal
+        if isodd(i)
+            # Rect(xpos, ypos, width, height)
+            draw(Rect(0, 100i - 1, 900, 3), colorant"black")
+        else
+            draw(Rect(100, 100i -1, 900, 3), colorant"black")
+        end
     end
 
     # draw shortcuts from gg objects
     for shortcut in gg.board.shortcuts
         if shortcut isa Ladder
-            draw(Line(posToTBT(shortcut.from)..., posToTBT(shortcut.to)...), colorant"green")
+            draw(Line(posToTBT2(shortcut.from)..., posToTBT2(shortcut.to)...), colorant"green")
         elseif shortcut isa Snake
-            draw(Line(posToTBT(shortcut.from)..., posToTBT(shortcut.to)...), colorant"red")
+            draw(Line(posToTBT2(shortcut.from)..., posToTBT2(shortcut.to)...), colorant"red")
         end
     end
 
     # draw circles for players
     for (n,p) in enumerate(gg.players)
-        draw(Circle(addJitter(posToTBT(p.position)...)..., 20),
+        draw(Circle(addJitter(posToTBT2(p.position)...)..., 20),
         [colorant"blue",colorant"orange",colorant"violet",colorant"yellow"][n],
          fill=true)
     end

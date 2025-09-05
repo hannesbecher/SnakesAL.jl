@@ -16,8 +16,10 @@ import StatsBase.Weights
 
 include("types.jl")
 include("someFuns.jl")
+include("examples.jl")
 
-export makeDiceAndRoll, oneRound, testGame
+export makeDiceAndRoll, oneRound, testGame0, testGame2, NaMiBoard, Game, Board, Player, Dice,
+ WeightedDice, Ladder, Snake, runToEnd!, roll, oneTurn!, oneRound!
 
 
 end

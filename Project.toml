@@ -9,7 +9,7 @@ GameZero = "9da27670-f782-11e9-1da1-f53579315bfe"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
-Colors = "0.12.11"
+Colors = "0.12.11, 0.13"
 GameZero = "0.3.1"
 StatsBase = "0.34.6"
 julia = "1.6.7"

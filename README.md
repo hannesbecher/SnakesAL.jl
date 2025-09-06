@@ -28,7 +28,7 @@ gg.players[1].position
 Using Markov chain theory:
 ```
 myBoard = SnakesAL.NM0 # again, the boring board no shortcuts
-getMarkovTransitionExpectation(myBoard, Dice(6)) # dependes on type of dice
+getMarkovTransitionExpectation(myBoard, Dice(6)) # depends on type of dice
 getMarkovTransitionVariance(myBoard, Dice(6))
 ```
 

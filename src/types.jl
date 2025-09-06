@@ -27,6 +27,11 @@ struct Board
 end
 
 
+"""
+    NaMiBoard(size::Int, elements::AbstractArray{Int,2})
+
+Create a standard board of given size with snakes and ladders defined by the 2-row matrix `elements` as by Nanda and Misra (2024). The first row contains the starting points of the shortcuts, the second row the end points. Ladders go from lower to higher numbers, snakes from higher to lower numbers. The starting points must be in strictly monotonic increasing order.
+"""
 function NaMiBoard(size::Int, elements::AbstractArray{Int,2})
     # check the input is correct
     @assert all(diff(elements[1,:]) .>= 1) "Starting point must be in strictly monotonic increasing order"

@@ -1,12 +1,17 @@
 
-# function to get transition matrix from board and dice
+
+
+"""
+    getTransitionMatrix(board::Board, dice::Dice)
+
+Compute the transition matrix for the given board and dice.
+"""
 function getTransitionMatrix(board::Board, dice::Dice)
     n = board.size
     P = zeros(n, n) # transition matrix
     for i in 1:n
         # only run if i is not a shortcut start otherwise prob to stay is 0
         if any(sc -> sc.from == i, board.shortcuts)
-            P[i, i] = 0.0
             continue
         end 
         for roll_value in 1:dice.nSides
@@ -31,12 +36,17 @@ end
 
 
 
-function getMarkovExpectation(board::Board, dice::Dice)
+"""
+    getMarkovTransitionExpectation(board::Board, dice::Dice)
+
+Compute the expected number of steps to reach the end of the board using Markov chain analysis.
+"""
+function getMarkovTransitionExpectation(board::Board, dice::Dice)
     P = getTransitionMatrix(board, dice)
     non0cols = map(x -> sum(x)!=0, eachcol(P))
     non0rows = map(x -> sum(x)!=0, eachrow(P))
 
-    tokeep = non0cols .& non0rows
+    tokeep = non0cols .| non0rows
     P = P[tokeep, tokeep] # keep only reachable states
     # now the last state is the absorbing state (the end)
 
@@ -45,4 +55,30 @@ function getMarkovExpectation(board::Board, dice::Dice)
     I_Q = inv(I(n-1) - Q)
 
     return sum(I_Q[1,:])
+end
+
+
+"""
+    getMarkovTransitionVariance(board::Board, dice::Dice)
+
+Compute the variance of the number of steps to reach the end of the board using Markov chain analysis.
+"""
+function getMarkovTransitionVariance(board::Board, dice::Dice)
+    P = getTransitionMatrix(board, dice)
+    non0cols = map(x -> sum(x)!=0, eachcol(P))
+    non0rows = map(x -> sum(x)!=0, eachrow(P))
+
+    tokeep = non0cols .| non0rows
+    P = P[tokeep, tokeep] # keep only reachable states
+    # now the last state is the absorbing state (the end)
+
+    n = size(P, 1)
+    Q = P[1:end-1, 1:end-1] # transient states
+    I_Q = inv(I(n-1) - Q)
+
+    ones_vec = ones(n-1)
+    e = I_Q * ones_vec
+    v = (2 * I_Q - I(n-1)) * e - e.^2
+
+    return v[1]
 end

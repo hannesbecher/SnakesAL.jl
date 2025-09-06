@@ -1,8 +1,9 @@
 module SnakesAL
-
-
+import StatsBase.mean
 import StatsBase.sample
 import StatsBase.Weights
+
+import LinearAlgebra: I,inv
 # Write your package code here.
 
 
@@ -17,9 +18,10 @@ import StatsBase.Weights
 include("types.jl")
 include("someFuns.jl")
 include("examples.jl")
+include("Markov.jl")
 
 export makeDiceAndRoll, oneRound, testGame0, testGame2, NaMiBoard, Game, Board, Player, Dice,
- WeightedDice, Ladder, Snake, runToEnd!, roll, oneTurn!, oneRound!
+ WeightedDice, Ladder, Snake, runToEnd!, roll, oneTurn!, oneRound!, getTransitionMatrix
 
 
 end

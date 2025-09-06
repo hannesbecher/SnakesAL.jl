@@ -83,8 +83,8 @@ posToTBT2(pos::Int) = begin
     return ((col + 1) * 100 - 50, (10 - row) * 100 - 50)
 end
 
-function runToEnd!(g::Game)
-    while !g.is_over
+function runToEnd!(g::Game, rMax=1e6)
+    while g.round <= rMax && !g.is_over
         g = oneRound!(g)
     end
     return g

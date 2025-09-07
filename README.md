@@ -10,7 +10,7 @@ The board has 100 fields. Players start on field 1. Whenever somebody's roll tak
 # cd into repo directory
 # then, in Julia:
 using Pkg;Pkg.activate(".")
-import SnakesAL
+using SnakesAL
 
 # Set up a Game by specifying a Board, vector of Players, and Dice
 gg = Game(SnakesAL.NM0,           # a pre-defined board, 100 fields, no shortcuts
@@ -24,13 +24,22 @@ gg.round
 gg.players[1].position
 ```
 
-### Set up your own board
+### Customising things
+Set up your own board, players, and dice:
 ```
 myBoard = Board(100, [Snake(17, 7), Snake(54, 34), Ladder(3, 22), Ladder(40, 85)])
 myGame = Game(myBoard, [Player("Bob", [1])], Dice(6))
 runToEnd!(myGame);
 myGame # show the game's state
 ```
+Custom dice can be specified via `WeightedDice`:
+```
+myDice = WeightedDice(6, [1,1,1,1,1,5]) # biased d6, 5 times more likely to roll a 6
+# 2D6 comes predefined in SnakesAL, check out:
+SnakesAL.TwoD6
+```
+
+
 
 ## Analyse game length and variance
 Using Markov chain theory:
@@ -60,8 +69,8 @@ NM14G0  NM6U
 NM7∆    NM8Ξ
 ```
 
-## Standalone works
-But useses slightly different rules ATM.
+## GUI
+Works, but uses slightly different rules ATM.
 
 ```
 # cd into the project directory

@@ -63,19 +63,39 @@ end
 
 
 """
-    WeightedDice(nSides::Int, weights::Vector{<:Real})
+    WeightedDice(nSides::Int, sides::Vector{Int}, weights::Vector{<:Real})
 
-An additional dice type with weighted sides. The `weights` may also be given as a `UnitRange`.
+An additional dice type with weighted sides. The `weights` may also be given as a
+`UnitRange`. The sides need not be consecutive integers.
 """
 struct WeightedDice <: AbstractDice
     "Number of sides"
     nSides::Int
+    sides::Vector{Int} # could be any set of integers, not just 1:nSides
     "Weights for each side"
     weights::Vector{<:Real}
+    
 end
 
 # constructor to create a weighted dice from a range of weights
-WeightedDice(nSides::Int, weights::UnitRange{<:Real}) = WeightedDice(nSides, collect(weights))
+
+
+
+
+WeightedDice(sides::Int, weights::Vector{<:Real}) = WeightedDice(sides, 1:sides, weights)
+WeightedDice(sides::Int, weights::UnitRange{<:Real}) = WeightedDice(sides, 1:sides, collect(weights))
+"""
+    WeightedDice(sides::Vector{Int}, weights::Vector{<:Real})   
+
+Several additional methods for WeightedDice allow for more flexible construction. The sides
+and weights must have the same length. The `sides` or `weights` may also be given as
+`UnitRange`s. The `sides` may also be one single `Int` as in `Dice`.
+"""
+WeightedDice(sides::Vector{Int}, weights::Vector{<:Real}) =  length(sides) == length(weights) ? WeightedDice(length(sides), sides, weights) : error("Sides and weights must have the same length")
+WeightedDice(sides::Vector{Int}, weights::UnitRange{<:Real}) = WeightedDice(sides, collect(weights))
+WeightedDice(sides::UnitRange{<:Int}, weights::Vector{<:Real}) = WeightedDice(collect(sides), weights)
+WeightedDice(sides::UnitRange{<:Int}, weights::UnitRange{<:Real}) = WeightedDice(collect(sides), collect(weights))
+
 
 # a function to roll the abstract dice
 roll(dice::AbstractDice) = error("roll not implemented for $(typeof(dice))")    
@@ -95,12 +115,12 @@ end
 
 Base.show(io::IO, ::MIME"text/plain", g::Game) = begin
 println(io, """SnakesAL Game
-               board size = $(g.board.size),
-               nPlayers = $(length(g.players)),
-               $(join(map(p -> "  Player: $(p.name), position: $(p.position[end])", g.players), "\n")),
-               current_player = \"$(g.players[g.current_player_index].name)\",
-               dice = $(typeof(g.dice)) with $(g.dice.nSides) sides$(if typeof(g.dice) == WeightedDice ", weights = $(g.dice.weights)" else "" end ),
-               is_over = $(g.is_over),
-               round = $(g.round)
+                 board size = $(g.board.size)
+                 nPlayers = $(length(g.players))
+               $(join(map(p -> "    Player: $(p.name), position: $(p.position[end])", g.players), "\n"))
+                 current_player = \"$(g.players[g.current_player_index].name)\"
+                 dice = $(typeof(g.dice)) with $(g.dice.nSides) sides$(if typeof(g.dice) == WeightedDice "\n    sides = $(g.dice.sides)\n    weights = $(g.dice.weights)" else "" end )
+                 is_over = $(g.is_over)
+                 round = $(g.round)
                """)
 end

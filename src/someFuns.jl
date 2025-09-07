@@ -117,7 +117,8 @@ posToTBT(pos::Int) = (((pos - 1) % 10 + 1) * 100 - 50, (10 - div(pos - 1, 10)) *
 """
     posToTBT2(pos::Int)
 
-Convert a board position (1 to 100) to (x,y) coordinates for plotting on a 10x10 board with alternating row directions.
+Convert a board position (1 to 100) to (x,y) coordinates for plotting on a 10x10 board with
+alternating row directions.
 """
 function posToTBT2(pos::Int) 
     row = div(pos - 1, 10)
@@ -144,7 +145,8 @@ end
 """
     runWithReps(g::Game, nReps::Int; rMax=1e6)
 
-Run independent replicates of the game `g` until completion or until `rMax` rounds have been played. Retains the entire Game object for each replicate.
+Run independent replicates of the game `g` until completion or until `rMax` rounds have
+been played. Retains the entire Game object for each replicate.
 """
 function runWithReps(g::Game, nReps::Int; rMax=1e6)
     ggs = Game[]

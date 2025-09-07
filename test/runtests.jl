@@ -8,8 +8,19 @@ using Test
     # Write your tests here.
     d6 = Dice(6)
     @test roll(d6) > 0 
-    d6w = WeightedDice(6, [1,2,3,4,5,6])
-    @test roll(d6w) > 0 
+    d6w1 = WeightedDice(6, [1,2,3,4,5,6])
+    d6w2 = WeightedDice(6, 1:6)
+    d6w3 = WeightedDice([2,3,4,5,6,7], [1,2,3,4,5,6])
+    d6w4 = WeightedDice([1,2,3,4,5,6], 1:6)
+    d6w5 = WeightedDice(6:11, [1,2,3,4,5,6])
+    d6w6 = WeightedDice(6:11, 1:6)
+    @test roll(d6w1) > 0 
+    @test roll(d6w2) > 0
+    @test roll(d6w3) > 0
+    @test roll(d6w4) > 0
+    @test roll(d6w5) > 0
+    @test roll(d6w6) > 0
+    @test_throws ErrorException WeightedDice([1,2,3], [1,2]) # sides and weights length mismatch
 end
 
 

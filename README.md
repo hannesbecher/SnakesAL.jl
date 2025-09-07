@@ -13,7 +13,7 @@ using Pkg;Pkg.activate(".")
 import SnakesAL
 
 # Set up a Game by specifying a Board, vector of Players, and Dice
-gg = Game(SnakesAL.NM0,           # a predifined board, 100 fields, no shortcuts
+gg = Game(SnakesAL.NM0,           # a pre-defined board, 100 fields, no shortcuts
           [Player("April", [1])], # one player with name and starting field
           Dice(6))                # an ordinary "d6"
 runToEnd!(gg); # roll dice and move until we hit field 100
@@ -22,6 +22,14 @@ runToEnd!(gg); # roll dice and move until we hit field 100
 gg.round
 # Retrace a  player's path
 gg.players[1].position
+```
+
+### Set up your own board
+```
+myBoard = Board(100, [Snake(17, 7), Snake(54, 34), Ladder(3, 22), Ladder(40, 85)])
+myGame = Game(myBoard, [Player("Bob", [1])], Dice(6))
+runToEnd!(myGame);
+myGame # show the game's state
 ```
 
 ## Analyse game length and variance

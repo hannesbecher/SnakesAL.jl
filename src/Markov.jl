@@ -1,5 +1,7 @@
 
 
+# Only defined for unweighted dice, see below
+getTransitionMatrix(board::Board, dice::AbstractDice) = error("getTransitionMatrix not implemented for $(typeof(dice))")
 
 """
     getTransitionMatrix(board::Board, dice::Dice)
@@ -34,7 +36,7 @@ function getTransitionMatrix(board::Board, dice::Dice)
     return P
 end 
 
-
+getMarkovTransitionExpectation(board::Board, dice::AbstractDice) = error("getMarkovTransitionExpectation not implemented for $(typeof(dice))")
 
 """
     getMarkovTransitionExpectation(board::Board, dice::Dice)
@@ -57,6 +59,7 @@ function getMarkovTransitionExpectation(board::Board, dice::Dice)
     return sum(I_Q[1,:])
 end
 
+getMarkovTransitionVariance(board::Board, dice::AbstractDice) = error("getMarkovTransitionVariance not implemented for $(typeof(dice))")
 
 """
     getMarkovTransitionVariance(board::Board, dice::Dice)

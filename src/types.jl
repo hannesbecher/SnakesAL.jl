@@ -61,11 +61,21 @@ struct Dice <: AbstractDice
     nSides::Int
 end
 
-# an additional dice type with weighted sides
+
+"""
+    WeightedDice(nSides::Int, weights::Vector{<:Real})
+
+An additional dice type with weighted sides. The `weights` may also be given as a `UnitRange`.
+"""
 struct WeightedDice <: AbstractDice
+    "Number of sides"
     nSides::Int
+    "Weights for each side"
     weights::Vector{<:Real}
 end
+
+# constructor to create a weighted dice from a range of weights
+WeightedDice(nSides::Int, weights::UnitRange{<:Real}) = WeightedDice(nSides, collect(weights))
 
 # a function to roll the abstract dice
 roll(dice::AbstractDice) = error("roll not implemented for $(typeof(dice))")    
@@ -81,4 +91,16 @@ mutable struct Game
     is_over::Bool
     round::Int
     Game(board, players, dice) = length(players) > 4 ? error("Four players max!") : new(board, players, dice, 1, false, 0)
+end
+
+Base.show(io::IO, ::MIME"text/plain", g::Game) = begin
+println(io, """SnakesAL Game
+               board size = $(g.board.size),
+               nPlayers = $(length(g.players)),
+               $(join(map(p -> "  Player: $(p.name), position: $(p.position[end])", g.players), "\n")),
+               current_player = \"$(g.players[g.current_player_index].name)\",
+               dice = $(typeof(g.dice)) with $(g.dice.nSides) sides$(if typeof(g.dice) == WeightedDice ", weights = $(g.dice.weights)" else "" end ),
+               is_over = $(g.is_over),
+               round = $(g.round)
+               """)
 end

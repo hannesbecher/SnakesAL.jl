@@ -4,7 +4,7 @@
 getTransitionMatrix(board::Board, dice::AbstractDice) = error("getTransitionMatrix not implemented for $(typeof(dice))")
 
 """
-    getTransitionMatrix(board::Board, dice::Dice)
+    getTransitionMatrix(board::Board, dice::AbstractDice)
 
 Compute the transition matrix for the given board and dice.
 """
@@ -36,22 +36,51 @@ function getTransitionMatrix(board::Board, dice::Dice)
     return P
 end 
 
-getMarkovTransitionExpectation(board::Board, dice::AbstractDice) = error("getMarkovTransitionExpectation not implemented for $(typeof(dice))")
+function getTransitionMatrix(board::Board, dice::WeightedDice)
+    n = board.size
+    P = zeros(n, n) # transition matrix
+    for i in 1:n
+        # only run if i is not a shortcut start otherwise prob to stay is 0
+        if any(sc -> sc.from == i, board.shortcuts)
+            continue
+        end 
+        for (roll_value, weight) in zip(dice.sides, dice.weights)
+
+            j = i + roll_value
+            if j > n
+                j = n # stop at end, dont bounce or overshoot
+                #j = n - (j - n) # bounce back if overshoot
+            end
+            # check for shortcuts
+            for sc in board.shortcuts
+                if sc.from == j
+                    j = sc.to
+                    break
+                end
+            end
+            P[i, j] += weight
+        end
+    end
+    return P
+end
+
+
 
 """
-    getMarkovTransitionExpectation(board::Board, dice::Dice)
+    getMarkovTransitionExpectation(board::Board, dice::AbstractDice)
 
 Compute the expected number of steps to reach the end of the board using Markov chain analysis.
 """
-function getMarkovTransitionExpectation(board::Board, dice::Dice)
+function getMarkovTransitionExpectation(board::Board, dice::AbstractDice)
     P = getTransitionMatrix(board, dice)
+
+    # remove states that are not reachable (e.g. the starting fields of shortcuts)
     non0cols = map(x -> sum(x)!=0, eachcol(P))
     non0rows = map(x -> sum(x)!=0, eachrow(P))
-
     tokeep = non0cols .| non0rows
-    P = P[tokeep, tokeep] # keep only reachable states
-    # now the last state is the absorbing state (the end)
+    P = P[tokeep, tokeep] 
 
+    # now the last state is the absorbing state (the end)
     n = size(P, 1)
     Q = P[1:end-1, 1:end-1] # transient states
     I_Q = inv(I(n-1) - Q)
@@ -59,14 +88,19 @@ function getMarkovTransitionExpectation(board::Board, dice::Dice)
     return sum(I_Q[1,:])
 end
 
-getMarkovTransitionVariance(board::Board, dice::AbstractDice) = error("getMarkovTransitionVariance not implemented for $(typeof(dice))")
+"""
+    getMarkovTransitionExpectation(gg::Game)
+"""
+getMarkovTransitionExpectation(gg::Game) = getMarkovTransitionExpectation(gg.board, gg.dice)
+
 
 """
-    getMarkovTransitionVariance(board::Board, dice::Dice)
+    getMarkovTransitionVariance(board::Board, dice::AbstractDice)
 
 Compute the variance of the number of steps to reach the end of the board using Markov chain analysis.
 """
-function getMarkovTransitionVariance(board::Board, dice::Dice)
+function getMarkovTransitionVariance(board::Board, dice::AbstractDice)
+    # analogous to the Expectation function above
     P = getTransitionMatrix(board, dice)
     non0cols = map(x -> sum(x)!=0, eachcol(P))
     non0rows = map(x -> sum(x)!=0, eachrow(P))
@@ -85,3 +119,7 @@ function getMarkovTransitionVariance(board::Board, dice::Dice)
 
     return v[1]
 end
+"""
+    getMarkovTransitionVariance(gg::Game)
+"""
+getMarkovTransitionVariance(gg::Game) = getMarkovTransitionVariance(gg.board, gg.dice)

@@ -20,6 +20,8 @@ include("someFuns.jl")
 include("examples.jl")
 include("Markov.jl")
 
+include("transmats.jl")
+
 export oneRound, testGame0, testGame2, NaMiBoard, Game, Board, Player, Dice,
  WeightedDice, Ladder, Snake, runToEnd!, roll, oneTurn!, oneRound!, runWithReps,
  getTransitionMatrix, getMarkovTransitionExpectation, getMarkovTransitionVariance

@@ -15,6 +15,16 @@ using Test
     @test_throws ErrorException Snake(7,7) # snake must go down
     @test_throws ErrorException Ladder(22,3) # ladder must go up
     @test_throws ErrorException Ladder(22,22) # ladder must go up
+    sc1 = [Ladder(1,10), Snake(19, 18), Snake(20,19), Ladder(18,20)]
+    sc2 = [Ladder(1,10), Snake(11, 1), Snake(30,20), Ladder(20,30)]
+    sc3 = [Ladder(1,10), Snake(20, 1), Snake(20,19), Ladder(20,30)]
+    # multi-shortcut loop causes identical from and to fields in delinked shortcut
+    @test_throws AssertionError SnakesAL.checkAndConditionShortcuts!(sc1) 
+    # short cut pair forming loop
+    @test_throws AssertionError SnakesAL.checkAndConditionShortcuts!(sc2)
+    # two shortcuts with same from field
+    @test_throws ErrorException SnakesAL.checkAndConditionShortcuts!(sc3)
+
 end
 
 @testset "Dice" begin

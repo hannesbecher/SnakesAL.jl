@@ -18,24 +18,73 @@ struct Snake <: ShortCut
 	Snake(from, to) = from <= to ? error("Snake must go down!") : new(from, to)
 end
 
+"""
+	constructShortcut(from::Int, to::Int)
 
-checkUniqueShortcutFroms(shortcuts::Vector{<:ShortCut}) = length(unique(map(sc -> sc.from, shortcuts))) == length(shortcuts)
+Make the correct type depending on direction of shortcut.
+"""
+function constructShortcut(from::Int, to::Int)
+	@assert from != to "Each shortcut must start and end on a different field. Multi shortcut loop present?"
+	return from < to ? Ladder(from, to) : Snake(from, to)
+end
+
+
+
+function checkUniqueShortcutFroms(shortcuts::Vector{<:ShortCut})
+	if length(unique(map(sc -> sc.from, shortcuts))) != length(shortcuts)
+		error("Each shortcut 'from' position must be unique!")
+	end
+	return true
+end
 
 sortShortcuts!(shortcuts::Vector{<:ShortCut}) = sort!(shortcuts, by = sc -> sc.from)
 
-# TODO
-# function to flag Ladder-Snake pairs that cause infinite loops
-# function needed to delink head to tail shortcuts into to with the same end field as Nanda and Misra do#
+
+"""
+	delinkHeadToTail(s1::ShortCut, s2::ShortCut)
+
+Takes two shortcuts `s1` and `s2` where the `to` field of `s1` is the same as the `from` field of `s2`.
+Returns a new shortcut to replace `s1` so that it goes from the `from` field of `s1` to the `to` field of `s2`.
+"""
+function delinkHeadToTail(s1::ShortCut, s2::ShortCut)
+	return constructShortcut(s1.from, s2.to)
+end
 
 
+function delinkAllHeadToTailPairs!(shortcuts::Vector{<:ShortCut})
+	@label before_loop
+	for i in 1:length(shortcuts)
+		for j in 1:length(shortcuts)
+			if j!=i && shortcuts[i].to == shortcuts[j].from
+				shortcuts[i] = delinkHeadToTail(shortcuts[i], shortcuts[j])
+				@goto before_loop
+			end
+		end
+	end
+	return shortcuts
+end	
 
+"""
+	checkAndConditionShortcuts!(shortcuts::Vector{<:ShortCut})
+
+Used in `Board` constructor, makes sure that there are no infinite loops,
+that each shortcut `from` position is unique, that all head-to-tail pairs
+are delinked and that the shortcuts are sorted by their 'from' position.
+"""
+function checkAndConditionShortcuts!(shortcuts::Vector{<:ShortCut})
+	checkUniqueShortcutFroms(shortcuts)
+	delinkAllHeadToTailPairs!(shortcuts)
+	return sortShortcuts!(shortcuts)
+end
+
+# function needed to delink head to tail shortcuts into to with the same end field as Nanda and Misra do
 
 # a board type to hold the board size and the snakes and ladders
 # add constructor that makes sure that each shortcut starting field can only be used once
 mutable struct Board
 	size::Int
 	shortcuts::Vector{<:ShortCut}
-	Board(size, shortcuts) = checkUniqueShortcutFroms(shortcuts) ? new(size, sortShortcuts!(shortcuts)) : error("Each shortcut 'from' position must be unique!")
+	Board(size, shortcuts) = new(size, checkAndConditionShortcuts!(shortcuts))
 end
 
 
@@ -142,7 +191,7 @@ end
 
 # show function for weighted dice that rounds the weights to 3 digits
 function Base.show(io::IO, ::MIME"text/plain", wd::WeightedDice)
-    println(io, "WeightedDice with $(wd.nSides) sides")
-    println(io, "    sides = $(wd.sides)")
-    println(io, "    weights = $(round.(wd.weights, digits=3))")
+	println(io, "WeightedDice with $(wd.nSides) sides")
+	println(io, "    sides = $(wd.sides)")
+	println(io, "    weights = $(round.(wd.weights, digits=3))")
 end

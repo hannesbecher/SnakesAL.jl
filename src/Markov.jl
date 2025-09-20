@@ -64,6 +64,13 @@ function getTransitionMatrix(board::Board, dice::WeightedDice)
     return P
 end
 
+function removeZeroFields(P)
+    states = 1:size(P, 1)
+    non0cols = map(x -> sum(x)!=0, eachcol(P))
+    non0rows = map(x -> sum(x)!=0, eachrow(P))
+    tokeep = non0cols .| non0rows
+    return states[tokeep], P[tokeep, tokeep]
+end
 
 
 """
@@ -73,12 +80,9 @@ Compute the expected number of steps to reach the end of the board using Markov 
 """
 function getMarkovTransitionExpectation(board::Board, dice::AbstractDice)
     P = getTransitionMatrix(board, dice)
-
     # remove states that are not reachable (e.g. the starting fields of shortcuts)
-    non0cols = map(x -> sum(x)!=0, eachcol(P))
-    non0rows = map(x -> sum(x)!=0, eachrow(P))
-    tokeep = non0cols .| non0rows
-    P = P[tokeep, tokeep] 
+    _, P = removeZeroFields(P)
+
 
     # now the last state is the absorbing state (the end)
     n = size(P, 1)
@@ -102,12 +106,7 @@ Compute the variance of the number of steps to reach the end of the board using 
 function getMarkovTransitionVariance(board::Board, dice::AbstractDice)
     # analogous to the Expectation function above
     P = getTransitionMatrix(board, dice)
-    non0cols = map(x -> sum(x)!=0, eachcol(P))
-    non0rows = map(x -> sum(x)!=0, eachrow(P))
-
-    tokeep = non0cols .| non0rows
-    P = P[tokeep, tokeep] # keep only reachable states
-    # now the last state is the absorbing state (the end)
+    _, P = removeZeroFields(P)
 
     n = size(P, 1)
     Q = P[1:end-1, 1:end-1] # transient states

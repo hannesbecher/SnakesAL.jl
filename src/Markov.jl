@@ -11,6 +11,8 @@ Compute the transition matrix for the given board and dice.
 function getTransitionMatrix(board::Board, dice::Dice)
     n = board.size
     P = zeros(n, n) # transition matrix
+    # TODO: instead of looping over all fields, start with list [1] and add visitables states
+    # TODO: also keep track of already visited states to avoid infinite loops
     for i in 1:n
         # only run if i is not a shortcut start otherwise prob to stay is 0
         if any(sc -> sc.from == i, board.shortcuts)
@@ -36,6 +38,7 @@ function getTransitionMatrix(board::Board, dice::Dice)
     return P
 end 
 
+# TODO: change as method above
 function getTransitionMatrix(board::Board, dice::WeightedDice)
     n = board.size
     P = zeros(n, n) # transition matrix

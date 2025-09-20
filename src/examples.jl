@@ -21,7 +21,8 @@ NM10α = NaMiBoard(100, [ 2 9 21 26 34 50 54 88 95 97;
 NM7∆ = NaMiBoard(100, [ 2 54 55 56 57 58 59;
                        99 50 32 27 23 39 41])
 # unwinnable?
-NM14G0 = 
+NM14G0 = NaMiBoard(100, [10 34 35 36 37 38 39 41 74 75 76 77 78 79;
+                         71 30 12 7 3 19 21 81 70 52 54 56 58 60])
 
 # Althoen et al. 1993, NB player starts at 0 not 1
 # also according to their rules, one must roll the exact number to land on 100

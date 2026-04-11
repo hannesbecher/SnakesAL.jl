@@ -41,8 +41,10 @@ end
     @test roll(d6w2) > 0
     @test roll(d6w3) > 0
     @test roll(d6w4) > 0
-    @test roll(d6w5) > 0
-    @test roll(d6w6) > 0
+    @test roll(d6w5) in 6:11
+    @test roll(d6w6) in 6:11
+    @test roll(WeightedDice([2], [1.0])) == 2
+    @test roll(WeightedDice(6:11, [1,0,0,0,0,0])) == 6
     @test_throws ErrorException WeightedDice([1,2,3], [1,2]) # sides and weights length mismatch
 end
 
@@ -74,6 +76,17 @@ end
     @test length(g.players[1].position) == 3
     g = runToEnd!(g)
     @test g.is_over == true
+
+    g2 = Game(Board(100, [Ladder(3, 22)]), [Player("Alice", [1])], WeightedDice([2], [1.0]))
+    summary = takeTurn!(g2)
+    @test summary isa TurnSummary
+    @test summary.player_name == "Alice"
+    @test summary.start_position == 1
+    @test summary.roll_value == 2
+    @test summary.landing_position == 3
+    @test summary.end_position == 22
+    @test summary.shortcut isa Ladder
+    @test g2.players[1].position[end] == 22
 end
 
 @testset "Markov" begin
@@ -99,4 +112,3 @@ end
     @test isapprox(getMarkovTransitionExpectation(gg2), expw)
     @test isapprox(getMarkovTransitionVariance(gg2), varw)
 end
-

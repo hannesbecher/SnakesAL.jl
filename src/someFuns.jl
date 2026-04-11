@@ -46,39 +46,69 @@ testGame0() = Game(NM0, [Player("Alice", [1])], Dice(6))
 
 
 """
+    takeTurn!(g::Game)
+
+Run a single turn of the game and return a `TurnSummary` describing the outcome.
+Returns `nothing` when the game is already over.
+"""
+function takeTurn!(g::Game)
+    g.is_over && return nothing
+
+    current_player_index = g.current_player_index
+    current_player = g.players[current_player_index]
+    start_position = current_player.position[end]
+    roll_value = roll(g.dice)
+    landing_position = min(start_position + roll_value, g.board.size)
+    new_position = landing_position
+    shortcut = nothing
+
+    for sc in g.board.shortcuts
+        if sc.from == new_position
+            shortcut = sc
+            new_position = sc.to
+            break
+        end
+    end
+
+    push!(current_player.position, new_position)
+    won = new_position == g.board.size
+    won && (g.is_over = true)
+    g.current_player_index = mod1(g.current_player_index + 1, length(g.players))
+
+    return TurnSummary(
+        current_player.name,
+        current_player_index,
+        start_position,
+        roll_value,
+        landing_position,
+        new_position,
+        shortcut,
+        won,
+    )
+end
+
+"""
     oneTurn!(g::Game; print=false)
 
 Run a single turn of the game, advancing the current player by one roll.
 """
 function oneTurn!(g::Game; print=false)
-    if g.is_over
-        println("Game is already over.")
+    summary = takeTurn!(g)
+    if isnothing(summary)
+        if(print) println("Game is already over.") end
         return g
     end
-    current_player = g.players[g.current_player_index]
-    roll_value = roll(g.dice)
-    if(print) println("Player $(current_player.name) rolled a $roll_value") end
-    new_position = current_player.position[end] + roll_value
-    if new_position > g.board.size
-        new_position = g.board.size # stop at end, dont bounce or overshoot
-        #new_position = g.board.size - (new_position - g.board.size) # bounce back if overshoot
-        #println("Player $(current_player.name) overshot and bounces back to $new_position")
+
+    if(print) println("Player $(summary.player_name) rolled a $(summary.roll_value)") end
+    if(print) println("Player $(summary.player_name) landed on $(summary.landing_position)") end
+    if !isnothing(summary.shortcut) && print
+        println("Player $(summary.player_name) hit a shortcut from $(summary.shortcut.from) to $(summary.shortcut.to)")
     end
-    # check for shortcuts
-    for sc in g.board.shortcuts
-        if sc.from == new_position
-            if(print) println("Player $(current_player.name) hit a shortcut from $(sc.from) to $(sc.to)") end
-            new_position = sc.to
-            break
-        end
+    if(print) println("Player $(summary.player_name) moved to position $(summary.end_position)") end
+    if summary.won && print
+        println("Player $(summary.player_name) wins!")
     end
-    push!(current_player.position, new_position)
-    if(print) println("Player $(current_player.name) moved to position $(current_player.position[end])") end
-    if current_player.position[end] == g.board.size
-        g.is_over = true
-        if(print) println("Player $(current_player.name) wins!") end
-    end
-    g.current_player_index = mod1(g.current_player_index + 1, length(g.players))
+
     return g
 end
 

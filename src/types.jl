@@ -161,7 +161,7 @@ WeightedDice(sides::UnitRange{<:Int}, weights::UnitRange{<:Real}) = WeightedDice
 # a function to roll the abstract dice
 roll(dice::AbstractDice) = error("roll not implemented for $(typeof(dice))")
 roll(dice::Dice) = rand(1:dice.nSides)
-roll(dice::WeightedDice) = sample(1:dice.nSides, Weights(dice.weights))
+roll(dice::WeightedDice) = sample(dice.sides, Weights(dice.weights))
 
 # we need a game type to hold the specs and state of a game
 mutable struct Game
@@ -172,6 +172,23 @@ mutable struct Game
 	is_over::Bool
 	round::Int
 	Game(board, players, dice) = length(players) > 4 ? error("Four players max!") : new(board, players, dice, 1, false, 0)
+end
+
+"""
+	TurnSummary
+
+Summary of a single call to `takeTurn!`, capturing the rolled value,
+intermediate landing position and any shortcut that was taken.
+"""
+struct TurnSummary
+	player_name::String
+	player_index::Int
+	start_position::Int
+	roll_value::Int
+	landing_position::Int
+	end_position::Int
+	shortcut::Union{Nothing, ShortCut}
+	won::Bool
 end
 
 function Base.show(io::IO, ::MIME"text/plain", g::Game)

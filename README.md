@@ -69,8 +69,32 @@ NM14G0  NM6U
 NM7∆    NM8Ξ
 ```
 
+## Terminal frontend
+A full-screen terminal frontend is available via `Tachikoma.jl`:
+
+Note: because `Tachikoma.jl` requires newer Julia releases, the package compat for this frontend is now `julia = "1.10"`.
+
+```
+# cd into the project directory
+using Pkg
+Pkg.activate(".")
+Pkg.instantiate()
+using SnakesAL
+
+run_terminal_frontend()
+```
+
+Controls:
+```
+SPACE / ENTER  roll the die
+r              restart the game
+q / ESC        quit
+```
+
+This frontend is designed for a regular terminal emulator such as GNOME Terminal and currently targets the standard 100-field board.
+
 ## GUI
-Works, but uses slightly different rules ATM.
+The older `GameZero` GUI is still available and uses slightly different rules ATM.
 
 ```
 # cd into the project directory
@@ -82,4 +106,3 @@ rungame("src/frontend.jl")
 # Hit SPACE to roll the die.
 ```
 ![Game board for Snakes and Ladders with colored circles representing player pieces, diagonal lines indicating snakes and ladders, and grid lines forming the board layout; arrows and text labels are present along the left side, creating a playful and interactive atmosphere](img/snakes.png)
-

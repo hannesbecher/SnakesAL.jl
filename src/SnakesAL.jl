@@ -19,12 +19,14 @@ include("types.jl")
 include("someFuns.jl")
 include("examples.jl")
 include("Markov.jl")
+include("tachikoma_frontend.jl")
 
 
 
 export oneRound, testGame0, testGame2, NaMiBoard, Game, Board, Player, Dice,
- WeightedDice, Ladder, Snake, runToEnd!, roll, oneTurn!, oneRound!, runWithReps,
+ WeightedDice, Ladder, Snake, TurnSummary, runToEnd!, roll, takeTurn!, oneTurn!, oneRound!, runWithReps,
  getTransitionMatrix, getMarkovTransitionExpectation, getMarkovTransitionVariance
+export run_terminal_frontend
 
 
 
